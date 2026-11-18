@@ -43,6 +43,19 @@ cd android
 
 امضا از `android/keystore.properties` خوانده می‌شود (این فایل و فایل `.jks` در git نیستند).
 
+## تبلیغات تپسل
+
+SDK بومی **Tapsell Mediation** (`ir.tapsell:tapsell:1.4.0-alpha04` + adapter `legacy`) داخل اپ است.
+
+- App Key در `android/app/build.gradle` به‌صورت `manifestPlaceholders["TapsellMediationAppKey"]` تعریف شده و در manifest ادغام‌شده با نام `ir.tapsell.mediation.APPLICATION_KEY` قرار می‌گیرد.
+- شناسهٔ zoneها در `android/app/src/main/java/ir/blockestan/game/TapsellConfig.java` است:
+  - بنر استاندارد: `6afd94a5728e2256843b0c2d`
+  - ویدیوی جایزه‌ای: `6afd9509aeabeb750feb8ebf`
+- پلاگین Capacitor در `TapsellAdsPlugin.java` (نام پلاگین: `TapsellAds`) و ثبت آن در `MainActivity.java` انجام شده است.
+- در سمت وب، `src/services/tapsellAds.ts` این پلاگین را صدا می‌زند. روی مرورگر خبری از تبلیغ واقعی نیست و همان جریان شبیه‌سازی‌شده اجرا می‌شود.
+- پاداش سکه/ادامهٔ بازی فقط با callback واقعی `onRewarded` داده می‌شود؛ بستن زودهنگام ویدیو جایزه ندارد.
+- بنر فقط در صفحه‌های منو نمایش داده می‌شود و در صفحهٔ بازی مخفی می‌شود؛ ارتفاع آن با متغیر CSS `--ad-banner-h` به رابط وب داده می‌شود تا روی نوار پایین نیفتد.
+
 ## کلید امضا
 
 - Keystore: `C:\Users\Administrator\blockestan-keys\blockestan-release.jks`
