@@ -21,3 +21,4 @@ Thumbs.db
 # Generated reports / artifacts
 app/build/
 docs/generated/
+release/

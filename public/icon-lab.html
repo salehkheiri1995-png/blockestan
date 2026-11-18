@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body { margin: 0; background: #04211e; font-family: system-ui, sans-serif; color: #cfe; }
+      .row { display: flex; gap: 32px; padding: 32px; align-items: flex-start; }
+      .box { text-align: center; font-size: 14px; opacity: .8; }
+      .sq { width: 420px; height: 420px; display: block; }
+      .round { border-radius: 50%; overflow: hidden; }
+      .squircle { border-radius: 22%; overflow: hidden; }
+      .small { width: 96px; height: 96px; display: block; margin-top: 18px; }
+      .tiny { width: 48px; height: 48px; display: block; margin-top: 18px; }
+    </style>
+  </head>
+  <body>
+    <div class="row">
+      <div class="box">
+        <div class="round"><svg class="sq" viewBox="0 0 1024 1024" width="420" height="420">
+          <defs>
+            <radialGradient id="vig" cx="50%" cy="48%" r="62%">
+              <stop offset="55%" stop-color="#03211d" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#03211d" stop-opacity="0.62"/>
+            </radialGradient>
+            <linearGradient id="bottom" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="62%" stop-color="#03211d" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#03211d" stop-opacity="0.55"/>
+            </linearGradient>
+            <radialGradient id="warm" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#FFD36B" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#FFD36B" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <g>
+            <g transform="translate(512 512) scale(1.2) translate(-520 -460)">
+              <image href="/src/assets/images/blockestan_hero_mascot_1794865543635.jpg" x="0" y="0" width="1024" height="1024"/>
+            </g>
+            <ellipse cx="340" cy="210" rx="240" ry="200" fill="url(#warm)" style="mix-blend-mode:screen"/>
+            <rect width="1024" height="1024" fill="url(#vig)"/>
+            <rect width="1024" height="1024" fill="url(#bottom)"/>
+            <path d="M150 150 l10 28 28 10 -28 10 -10 28 -10 -28 -28 -10 28 -10z" fill="#FFF6D8" opacity="0.75"/>
+            <path d="M880 210 l7 20 20 7 -20 7 -7 20 -7 -20 -20 -7 20 -7z" fill="#BFFCF4" opacity="0.6"/>
+            <path d="M130 840 l6 16 16 6 -16 6 -6 16 -6 -16 -16 -6 16 -6z" fill="#BFFCF4" opacity="0.5"/>
+            <path d="M872 820 l8 22 22 8 -22 8 -8 22 -8 -22 -22 -8 22 -8z" fill="#FFF6D8" opacity="0.55"/>
+          </g>
+        </svg></div>
+        <div class="small"><svg class="sq" viewBox="0 0 1024 1024" width="96" height="96" style="border-radius:50%;overflow:hidden">
+          <use href="#none"/>
+        </svg></div>
+      </div>
+      <div class="box">
+        circle launcher preview (same art, masked)
+      </div>
+    </div>
+  </body>
+</html>

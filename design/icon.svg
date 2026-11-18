@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="78%">
+      <stop offset="0%" stop-color="#12665C"/>
+      <stop offset="52%" stop-color="#0B4A43"/>
+      <stop offset="100%" stop-color="#052622"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7FF3E4" stop-opacity="0.34"/>
+      <stop offset="55%" stop-color="#4FD1C5" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#4FD1C5" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="turq" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0%" stop-color="#8DF7E9"/>
+      <stop offset="45%" stop-color="#4FD9C8"/>
+      <stop offset="100%" stop-color="#179A8C"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0%" stop-color="#FFE9A8"/>
+      <stop offset="45%" stop-color="#FFD36B"/>
+      <stop offset="100%" stop-color="#D9951C"/>
+    </linearGradient>
+    <linearGradient id="coral" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0%" stop-color="#FFB3AE"/>
+      <stop offset="45%" stop-color="#FF8C8C"/>
+      <stop offset="100%" stop-color="#D85260"/>
+    </linearGradient>
+    <linearGradient id="cream" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="45%" stop-color="#FFF3DC"/>
+      <stop offset="100%" stop-color="#DCC7A2"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.55"/>
+      <stop offset="42%" stop-color="#FFFFFF" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <filter id="shadow" x="-35%" y="-35%" width="170%" height="170%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#03201C" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glowSmall" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+    <pattern id="tile" width="256" height="256" patternUnits="userSpaceOnUse">
+      <g fill="none" stroke="#8FF7EA" stroke-opacity="0.085" stroke-width="2.5">
+        <rect x="64" y="64" width="128" height="128" rx="8"/>
+        <rect x="64" y="64" width="128" height="128" rx="8" transform="rotate(45 128 128)"/>
+        <circle cx="128" cy="128" r="17"/>
+        <circle cx="0" cy="0" r="10"/>
+        <circle cx="256" cy="0" r="10"/>
+        <circle cx="0" cy="256" r="10"/>
+        <circle cx="256" cy="256" r="10"/>
+      </g>
+    </pattern>
+    <clipPath id="blk">
+      <rect x="0" y="0" width="250" height="250" rx="58"/>
+    </clipPath>
+  </defs>
+
+  <!-- background -->
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <rect width="1024" height="1024" fill="url(#tile)"/>
+  <ellipse cx="512" cy="470" rx="430" ry="380" fill="url(#glow)"/>
+
+  <!-- subtle persian arch -->
+  <path d="M512 128 C 622 236 690 318 690 430 C 690 500 646 540 512 540 C 378 540 334 500 334 430 C 334 318 402 236 512 128 Z"
+        fill="none" stroke="#FFD36B" stroke-opacity="0.16" stroke-width="6"/>
+  <path d="M512 168 C 600 256 656 326 656 424 C 656 476 624 504 512 504 C 400 504 368 476 368 424 C 368 326 424 256 512 168 Z"
+        fill="none" stroke="#8FF7EA" stroke-opacity="0.10" stroke-width="3"/>
+
+  <!-- rosette behind the blocks -->
+  <g transform="translate(512 512)" fill="none" stroke="#FFD36B" stroke-opacity="0.14" stroke-width="4">
+    <circle r="252"/>
+    <circle r="212" stroke-opacity="0.10"/>
+    <g stroke-opacity="0.10">
+      <rect x="-150" y="-150" width="300" height="300" rx="18"/>
+      <rect x="-150" y="-150" width="300" height="300" rx="18" transform="rotate(45)"/>
+    </g>
+  </g>
+
+  <!-- corner sparkles -->
+  <g fill="#BFFCF4">
+    <path d="M186 210 l9 26 26 9 -26 9 -9 26 -9 -26 -26 -9 26 -9z" opacity="0.55"/>
+    <path d="M820 764 l7 20 20 7 -20 7 -7 20 -7 -20 -20 -7 20 -7z" opacity="0.45"/>
+    <circle cx="286" cy="770" r="7" opacity="0.30"/>
+    <circle cx="760" cy="242" r="6" opacity="0.35"/>
+  </g>
+
+  <!-- blocks -->
+  <g filter="url(#shadow)">
+    <!-- turquoise -->
+    <g transform="translate(250 250)">
+      <rect width="250" height="250" rx="58" fill="url(#turq)"/>
+      <g clip-path="url(#blk)">
+        <rect width="250" height="250" fill="url(#sheen)"/>
+        <rect x="26" y="18" width="152" height="34" rx="17" fill="#FFFFFF" opacity="0.38"/>
+        <rect x="-30" y="206" width="310" height="80" fill="#043B36" opacity="0.22"/>
+        <rect x="196" y="-30" width="80" height="310" fill="#ffffff" opacity="0.05"/>
+      </g>
+      <rect x="1.5" y="1.5" width="247" height="247" rx="57" fill="none" stroke="#BFFFF6" stroke-opacity="0.55" stroke-width="3"/>
+    </g>
+    <!-- gold -->
+    <g transform="translate(524 250)">
+      <rect width="250" height="250" rx="58" fill="url(#gold)"/>
+      <g clip-path="url(#blk)">
+        <rect width="250" height="250" fill="url(#sheen)"/>
+        <rect x="26" y="18" width="152" height="34" rx="17" fill="#FFFFFF" opacity="0.42"/>
+        <rect x="-30" y="206" width="310" height="80" fill="#6B3D00" opacity="0.20"/>
+      </g>
+      <rect x="1.5" y="1.5" width="247" height="247" rx="57" fill="none" stroke="#FFF6D8" stroke-opacity="0.55" stroke-width="3"/>
+    </g>
+    <!-- coral -->
+    <g transform="translate(250 524)">
+      <rect width="250" height="250" rx="58" fill="url(#coral)"/>
+      <g clip-path="url(#blk)">
+        <rect width="250" height="250" fill="url(#sheen)"/>
+        <rect x="26" y="18" width="152" height="34" rx="17" fill="#FFFFFF" opacity="0.38"/>
+        <rect x="-30" y="206" width="310" height="80" fill="#5C0E18" opacity="0.22"/>
+      </g>
+      <rect x="1.5" y="1.5" width="247" height="247" rx="57" fill="none" stroke="#FFD9D5" stroke-opacity="0.5" stroke-width="3"/>
+    </g>
+    <!-- cream -->
+    <g transform="translate(524 524)">
+      <rect width="250" height="250" rx="58" fill="url(#cream)"/>
+      <g clip-path="url(#blk)">
+        <rect width="250" height="250" fill="url(#sheen)"/>
+        <rect x="26" y="18" width="152" height="34" rx="17" fill="#FFFFFF" opacity="0.65"/>
+        <rect x="-30" y="206" width="310" height="80" fill="#8A6A3A" opacity="0.18"/>
+      </g>
+      <rect x="1.5" y="1.5" width="247" height="247" rx="57" fill="none" stroke="#FFFFFF" stroke-opacity="0.7" stroke-width="3"/>
+    </g>
+  </g>
+
+  <!-- center gem sparkle on the seam -->
+  <g transform="translate(512 512)">
+    <circle r="34" fill="#FFFFFF" opacity="0.10" filter="url(#glowSmall)"/>
+    <path d="M0 -26 L8 -8 L26 0 L8 8 L0 26 L-8 8 L-26 0 L-8 -8 Z" fill="#FFF9E8" opacity="0.9"/>
+    <path d="M0 -12 L4 -4 L12 0 L4 4 L0 12 L-4 4 L-12 0 L-4 -4 Z" fill="#FFFFFF"/>
+  </g>
+</svg>
