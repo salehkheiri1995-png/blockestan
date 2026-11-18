@@ -9,7 +9,7 @@ export default defineConfig({
     port: 3000,
     allowedHosts: true,
     watch: {
-      ignored: ['**/android/**', '**/release/**'],
+      ignored: ['**/android/**', '**/release/**', '**/design/**'],
     },
   },
   preview: {
