@@ -40,15 +40,14 @@ function New-RoundedPath([System.Drawing.RectangleF]$rect, [single]$radius) {
 
 $icon = [System.Drawing.Image]::FromFile($iconPath)
 $adaptive = [System.Drawing.Image]::FromFile($adaptivePath)
-$bgSample = (New-Object System.Drawing.Bitmap($iconPath)).GetPixel(24, [int]($icon.Height / 2))
-$bg = [System.Drawing.Color]::FromArgb(255, $bgSample.R, $bgSample.G, $bgSample.B)
+$bg = [System.Drawing.ColorTranslator]::FromHtml('#063B35')
 
 # --- Legacy launcher icons -------------------------------------------------
 $densities = @{ 'mdpi' = 48; 'hdpi' = 72; 'xhdpi' = 96; 'xxhdpi' = 144; 'xxxhdpi' = 192 }
 foreach ($d in $densities.Keys) {
     $size = $densities[$d]
 
-    $c = New-Canvas $size $size $bg
+    $c = New-Canvas $size $size ([System.Drawing.Color]::Transparent)
     $rect = New-Object System.Drawing.RectangleF(0, 0, $size, $size)
     $path = New-RoundedPath $rect ([single]($size * 0.22))
     $c.Graphics.SetClip($path)
@@ -56,7 +55,7 @@ foreach ($d in $densities.Keys) {
     Save-Png $c.Bitmap (Join-Path $res "mipmap-$d\ic_launcher.png")
     $path.Dispose(); $c.Graphics.Dispose(); $c.Bitmap.Dispose()
 
-    $c = New-Canvas $size $size $bg
+    $c = New-Canvas $size $size ([System.Drawing.Color]::Transparent)
     $path = New-Object System.Drawing.Drawing2D.GraphicsPath
     $path.AddEllipse(0, 0, $size, $size)
     $c.Graphics.SetClip($path)
