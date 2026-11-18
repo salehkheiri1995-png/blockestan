@@ -5,6 +5,8 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        // Tapsell Mediation SDK and its adapters.
+        maven { url "https://maven.tapsell.ir" }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.7.2'
@@ -21,6 +23,8 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        // Tapsell Mediation SDK and its adapters.
+        maven { url "https://maven.tapsell.ir" }
     }
 }
 

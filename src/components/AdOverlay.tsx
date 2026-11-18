@@ -2,8 +2,17 @@ import React from 'react';
 import { AdUi, RewardPurpose } from '../state/useGameController';
 import { GamePalette } from '../theme/themes';
 
-export const SimulatedAdOverlay: React.FC<{ ad: AdUi; palette: GamePalette }> = ({ ad, palette }) => {
-  if (!ad.showing || !ad.simulated) return null;
+/**
+ * Lightweight overlay shown while an ad is being prepared.
+ *
+ * - On the web build it marks the simulated ad flow.
+ * - On Android it covers the short moment before the real Tapsell video opens; the Tapsell
+ *   player takes over the screen once the video is ready.
+ */
+export const AdOverlay: React.FC<{ ad: AdUi; palette: GamePalette }> = ({ ad, palette }) => {
+  if (!ad.showing) return null;
+
+  const simulated = ad.simulated;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
@@ -16,10 +25,12 @@ export const SimulatedAdOverlay: React.FC<{ ad: AdUi; palette: GamePalette }> = 
           style={{ borderColor: `${palette.accent} transparent ${palette.accent} ${palette.accent}` }}
         />
         <h2 className="font-bold text-lg" style={{ color: palette.onSurface }}>
-          تبلیغ شبیه‌سازی‌شده
+          {simulated ? 'تبلیغ شبیه‌سازی‌شده' : 'در حال آماده‌سازی ویدیو'}
         </h2>
         <p className="text-xs leading-relaxed" style={{ color: palette.onSurfaceMuted }}>
-          این نسخهٔ آزمایشی است؛ تبلیغ واقعی نمایش داده نمی‌شود و هیچ درآمدی ایجاد نمی‌کند. جایزه فقط به‌صورت آزمایشی اضافه می‌شود.
+          {simulated
+            ? 'این نسخهٔ آزمایشی است؛ تبلیغ واقعی نمایش داده نمی‌شود و هیچ درآمدی ایجاد نمی‌کند. جایزه فقط به‌صورت آزمایشی اضافه می‌شود.'
+            : 'ویدیوی جایزه‌دار در حال باز شدن است. برای دریافت جایزه باید تماشای ویدیو را کامل کنی؛ بستن زودهنگام جایزه‌ای ندارد.'}
         </p>
         <span className="text-[11px] font-medium" style={{ color: palette.accent }}>
           {ad.purpose === RewardPurpose.CONTINUE

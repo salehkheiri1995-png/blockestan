@@ -16,6 +16,9 @@ android {
         versionCode 1
         versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // Tapsell reads the application key from the merged manifest
+        // (meta-data "ir.tapsell.mediation.APPLICATION_KEY").
+        manifestPlaceholders = [TapsellMediationAppKey: "kqrjqhfqpocrmomifdpsrgfqqpfohstoknkifiehobofbikhakfeohjpmjikieqgsehoer"]
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
@@ -55,6 +58,9 @@ dependencies {
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
+    // Tapsell Mediation: standard banner + rewarded video.
+    implementation "ir.tapsell:tapsell:1.4.0-alpha04"
+    implementation "ir.tapsell.mediation.adapter:legacy:1.4.0-alpha04"
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"

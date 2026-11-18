@@ -23,6 +23,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ current, ctrl, palette }) 
         aria-label="منوی اصلی"
         className="lg:hidden fixed bottom-0 inset-x-0 z-30 px-2.5 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-md"
         style={{
+          bottom: 'var(--ad-banner-h, 0px)',
           backgroundColor: hexAlpha(palette.surfaceElevated, 0.94),
           borderTop: `1px solid ${hexAlpha(palette.cellGrid, 0.45)}`,
           boxShadow: '0 -6px 22px rgba(0, 0, 0, 0.22)',

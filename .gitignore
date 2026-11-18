@@ -18,7 +18,17 @@ captures/
 .DS_Store
 Thumbs.db
 
+# Node / Vite
+node_modules/
+dist/
+.vite/
+*.log
+npm-debug.log*
+
 # Generated reports / artifacts
 app/build/
 docs/generated/
 release/
+
+# Capacitor generated web bundle inside the native project
+android/app/src/main/assets/public/

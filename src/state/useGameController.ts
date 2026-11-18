@@ -24,6 +24,7 @@ import {
 } from '../engine/models';
 import { AppSaveData, CoinReason, sanitizeSaveData } from '../engine/persistence';
 import { isNativeBazaarAvailable, launchNativeBazaarPurchase } from '../services/bazaarBilling';
+import { isNativeAdsAvailable, showRewardedAd } from '../services/tapsellAds';
 import { faDigits, newRequestId, todayDayKey } from '../utils/fa';
 import { triggerHaptic } from '../utils/haptics';
 import { soundPlayer } from '../utils/sound';
@@ -164,9 +165,11 @@ export function useGameController() {
       ad: { showing: false, simulated: false, purpose: null, message: null },
       lastCleared: [],
       fx: null,
-      adStatusLabel: 'تبلیغ شبیه‌سازی‌شده (نسخهٔ وب، بدون درآمد)',
+      adStatusLabel: isNativeAdsAvailable()
+        ? 'تبلیغات تپسل فعال است (بنر + ویدیوی جایزه‌دار)'
+        : 'تبلیغ شبیه‌سازی‌شده (نسخهٔ وب، بدون درآمد)',
       rewardedConfigured: true,
-      rewardedSimulated: true,
+      rewardedSimulated: !isNativeAdsAvailable(),
       activeStoryModal: null,
       pendingBazaarProduct: null,
       bazaarProcessing: false,
@@ -858,57 +861,85 @@ export function useGameController() {
     }
   }, [commitSave, resumeAfterContinue, snack]);
 
+  const applyRewardedReward = useCallback(
+    (purpose: RewardPurpose, requestId: string) => {
+      commitSave((s) => {
+        let next = { ...s, lastRewardedAtMs: Date.now() };
+        if (purpose === RewardPurpose.COINS) {
+          const granted = Economy.grant(
+            next,
+            GameBalanceConfig.REWARDED_AD_COINS,
+            CoinReason.REWARDED_AD,
+            requestId,
+            Date.now()
+          );
+          if (granted.type === 'Applied') {
+            next = granted.save;
+            soundPlayer.playCoin(next.soundEnabled);
+          }
+        }
+        return next;
+      });
+
+      if (purpose === RewardPurpose.COINS) {
+        snack(`${faDigits(GameBalanceConfig.REWARDED_AD_COINS)} سکه اضافه شد.`);
+      } else if (purpose === RewardPurpose.CONTINUE) {
+        const active = sessionRef.current;
+        const plan = uiRef.current.pendingRescue;
+        if (active && plan && active.applyRescue(plan)) {
+          resumeAfterContinue(active);
+        } else {
+          snack('ادامه ممکن نبود.');
+        }
+      }
+    },
+    [commitSave, resumeAfterContinue, snack]
+  );
+
+  const closeAdOverlay = useCallback(() => {
+    setUi((prev) => ({
+      ...prev,
+      ad: { showing: false, simulated: false, purpose: null, message: null },
+    }));
+  }, []);
+
   const requestRewarded = useCallback(
     (purpose: RewardPurpose) => {
       if (uiRef.current.ad.showing) return;
       const requestId = `ad-${newRequestId()}`;
+      const native = isNativeAdsAvailable();
+
       setUi((prev) => ({
         ...prev,
-        ad: { showing: true, simulated: true, purpose, message: null },
+        ad: { showing: true, simulated: !native, purpose, message: null },
       }));
 
-      const rewardTimer = window.setTimeout(() => {
-        commitSave((s) => {
-          let next = { ...s, lastRewardedAtMs: Date.now() };
-          if (purpose === RewardPurpose.COINS) {
-            const granted = Economy.grant(
-              next,
-              GameBalanceConfig.REWARDED_AD_COINS,
-              CoinReason.REWARDED_AD,
-              requestId,
-              Date.now()
-            );
-            if (granted.type === 'Applied') {
-              next = granted.save;
-              soundPlayer.playCoin(next.soundEnabled);
+      if (native) {
+        // Real Tapsell rewarded video: the reward is granted only when the SDK reports a
+        // completed view, never on an early close or a failed load.
+        void showRewardedAd()
+          .then((result) => {
+            if (result.status === 'rewarded') {
+              applyRewardedReward(purpose, requestId);
+            } else if (result.status === 'closed') {
+              snack('برای دریافت جایزه باید ویدیو را کامل تماشا کنی.');
+            } else {
+              snack('تبلیغ در دسترس نبود؛ چند لحظه بعد دوباره تلاش کن.');
             }
-          }
-          return next;
-        });
+          })
+          .finally(closeAdOverlay);
+        return;
+      }
 
-        if (purpose === RewardPurpose.COINS) {
-          snack(`${faDigits(GameBalanceConfig.REWARDED_AD_COINS)} سکه اضافه شد.`);
-        } else if (purpose === RewardPurpose.CONTINUE) {
-          const active = sessionRef.current;
-          const plan = uiRef.current.pendingRescue;
-          if (active && plan && active.applyRescue(plan)) {
-            resumeAfterContinue(active);
-          } else {
-            snack('ادامه ممکن نبود.');
-          }
-        }
+      const rewardTimer = window.setTimeout(() => {
+        applyRewardedReward(purpose, requestId);
       }, 1400);
 
-      const closeTimer = window.setTimeout(() => {
-        setUi((prev) => ({
-          ...prev,
-          ad: { showing: false, simulated: false, purpose: null, message: null },
-        }));
-      }, 1700);
+      const closeTimer = window.setTimeout(closeAdOverlay, 1700);
 
       adTimersRef.current.push(rewardTimer, closeTimer);
     },
-    [commitSave, resumeAfterContinue, snack]
+    [applyRewardedReward, closeAdOverlay, snack]
   );
 
   const requestRewardedCoins = useCallback(() => {

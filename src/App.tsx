@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BazaarCheckoutModal } from './components/BazaarCheckoutModal';
 import { BottomNav } from './components/BottomNav';
 import { GameScreen } from './components/GameScreen';
@@ -6,9 +7,15 @@ import { LevelsScreen } from './components/LevelsScreen';
 import { PrivacyScreen } from './components/PrivacyScreen';
 import { SettingsScreen } from './components/SettingsScreen';
 import { ShopScreen } from './components/ShopScreen';
-import { SimulatedAdOverlay } from './components/SimulatedAdOverlay';
+import { AdOverlay } from './components/AdOverlay';
 import { StoryModal } from './components/StoryModal';
 import { activeStoryChapter } from './data/story';
+import {
+  hideBannerAd,
+  initializeAds,
+  isNativeAdsAvailable,
+  showBannerAd,
+} from './services/tapsellAds';
 import { Screen, useGameController } from './state/useGameController';
 import { GameThemes, hexAlpha } from './theme/themes';
 
@@ -19,6 +26,21 @@ export function App() {
   const ambientChapter = activeStoryChapter(ui.save.unlockedLevel);
 
   const showNav = ui.screen !== Screen.GAME && ui.screen !== Screen.PRIVACY;
+
+  // Tapsell: warm the SDK up once, then keep the standard banner on menu screens only so the
+  // board stays unobstructed while playing.
+  useEffect(() => {
+    void initializeAds();
+  }, []);
+
+  useEffect(() => {
+    if (!isNativeAdsAvailable()) return;
+    if (showNav) {
+      void showBannerAd();
+    } else {
+      void hideBannerAd();
+    }
+  }, [showNav]);
 
   return (
     <div
@@ -51,7 +73,11 @@ export function App() {
       <div className="relative z-10 flex-1 w-full flex flex-col">
         {showNav && <BottomNav current={ui.screen} ctrl={ctrl} palette={palette} />}
 
-        <main className={`flex-1 w-full flex flex-col ${showNav ? 'pb-24 lg:pb-6' : ''}`}>
+        <main
+          className={`flex-1 w-full flex flex-col ${
+            showNav ? 'pb-[calc(6rem+var(--ad-banner-h,0px))] lg:pb-6' : ''
+          }`}
+        >
           {ui.screen === Screen.HOME && <HomeScreen ui={ui} ctrl={ctrl} palette={palette} />}
           {ui.screen === Screen.LEVELS && <LevelsScreen ui={ui} ctrl={ctrl} palette={palette} />}
           {ui.screen === Screen.GAME && <GameScreen ui={ui} ctrl={ctrl} palette={palette} />}
@@ -64,9 +90,8 @@ export function App() {
       {/* Snackbar positioned safely above Android thumb-zone BottomNav */}
       {ui.snack && (
         <div
-          className={`fixed left-4 right-4 z-50 flex justify-center pointer-events-none ${
-            showNav ? 'bottom-20 lg:bottom-4' : 'bottom-4'
-          }`}
+          className="fixed left-4 right-4 z-50 flex justify-center pointer-events-none"
+          style={{ bottom: showNav ? 'calc(5rem + var(--ad-banner-h, 0px))' : 'calc(1rem + var(--ad-banner-h, 0px))' }}
         >
           <div
             className="w-full max-w-md rounded-[14px] px-3.5 py-3 flex items-center justify-between gap-3 shadow-lg pointer-events-auto"
@@ -101,7 +126,7 @@ export function App() {
         onCancel={ctrl.cancelSandboxBazaarPurchase}
       />
 
-      <SimulatedAdOverlay ad={ui.ad} palette={palette} />
+      <AdOverlay ad={ui.ad} palette={palette} />
     </div>
   );
 }
