@@ -95,9 +95,9 @@ public class TapsellAdsPlugin extends Plugin {
         }
 
         bannerVisible = true;
-        attachBannerContainer(activity);
 
         if (bannerAdId != null) {
+            attachBannerContainer(activity);
             displayBanner(activity, bannerAdId);
             call.resolve(bannerState(true, activity));
             return;
@@ -110,6 +110,7 @@ public class TapsellAdsPlugin extends Plugin {
                     bannerAdId = adId;
                     Activity host = getActivity();
                     if (bannerVisible && host != null) {
+                        attachBannerContainer(host);
                         displayBanner(host, adId);
                         call.resolve(bannerState(true, host));
                     } else {
@@ -122,7 +123,7 @@ public class TapsellAdsPlugin extends Plugin {
             public void onFailure(String message) {
                 mainHandler.post(() -> {
                     Log.w(TAG, "Banner request failed: " + message);
-                    // The game stays fully usable without a banner.
+                    // The game stays fully usable without a banner; no space is reserved.
                     call.resolve(bannerState(false, null));
                 });
             }
@@ -169,11 +170,23 @@ public class TapsellAdsPlugin extends Plugin {
 
     private void attachBannerContainer(Activity activity) {
         if (bannerContainer == null) {
-            bannerContainer = new BannerContainer(activity);
-            bannerContainer.setBackgroundColor(Color.TRANSPARENT);
+            try {
+                bannerContainer = new BannerContainer(activity);
+                bannerContainer.setBackgroundColor(Color.TRANSPARENT);
+            } catch (Throwable error) {
+                Log.e(TAG, "Creating banner container failed", error);
+                bannerContainer = null;
+                bannerVisible = false;
+                return;
+            }
         }
 
-        ViewGroup root = activity.findViewById(android.R.id.content);
+        ViewGroup root;
+        try {
+            root = activity.findViewById(android.R.id.content);
+        } catch (Throwable error) {
+            root = null;
+        }
         if (root == null) return;
         if (bannerContainer.getParent() == root) {
             bannerContainer.setVisibility(View.VISIBLE);
@@ -183,14 +196,18 @@ public class TapsellAdsPlugin extends Plugin {
             ((ViewGroup) bannerContainer.getParent()).removeView(bannerContainer);
         }
 
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        params.gravity = Gravity.BOTTOM;
-        root.addView(bannerContainer, params);
-        bannerContainer.setVisibility(View.VISIBLE);
-        applyBannerInset(root);
+        try {
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    Math.round(50f * activity.getResources().getDisplayMetrics().density)
+            );
+            params.gravity = Gravity.BOTTOM;
+            root.addView(bannerContainer, params);
+            bannerContainer.setVisibility(View.VISIBLE);
+            applyBannerInset(root);
+        } catch (Throwable error) {
+            Log.e(TAG, "Attaching banner failed", error);
+        }
     }
 
     /** Keeps the banner above the gesture navigation bar on edge-to-edge devices. */
@@ -224,9 +241,13 @@ public class TapsellAdsPlugin extends Plugin {
     private void hideBannerInternal() {
         bannerVisible = false;
         if (bannerContainer != null) {
-            bannerContainer.setVisibility(View.GONE);
-            ViewGroup parent = (ViewGroup) bannerContainer.getParent();
-            if (parent != null) parent.removeView(bannerContainer);
+            try {
+                bannerContainer.setVisibility(View.GONE);
+                ViewGroup parent = (ViewGroup) bannerContainer.getParent();
+                if (parent != null) parent.removeView(bannerContainer);
+            } catch (Throwable error) {
+                Log.w(TAG, "Hiding banner failed", error);
+            }
         }
         if (bannerAdId != null) {
             try {
@@ -341,16 +362,18 @@ public class TapsellAdsPlugin extends Plugin {
 
                 @Override
                 public void onRewarded() {
-                    if (rewardedEarned) return;
-                    rewardedEarned = true;
-                    JSObject data = new JSObject();
-                    data.put("earned", true);
-                    notifyListeners("rewarded", data);
+                    markRewardedEarned();
+                    finishRewarded("rewarded", null);
                 }
 
                 @Override
                 public void onAdClosed(AdShowCompletionState completionState) {
-                    finishRewarded(rewardedEarned ? "rewarded" : "closed", null);
+                    if (completionState == AdShowCompletionState.COMPLETED) {
+                        markRewardedEarned();
+                        finishRewarded("rewarded", null);
+                    } else {
+                        finishRewarded(rewardedEarned ? "rewarded" : "closed", null);
+                    }
                     preloadRewarded();
                 }
 
@@ -363,6 +386,17 @@ public class TapsellAdsPlugin extends Plugin {
         } catch (Throwable error) {
             finishRewarded("failed", error.getMessage());
             preloadRewarded();
+        }
+    }
+
+    private void markRewardedEarned() {
+        if (rewardedEarned) return;
+        rewardedEarned = true;
+        try {
+            JSObject data = new JSObject();
+            data.put("earned", true);
+            notifyListeners("rewarded", data);
+        } catch (Throwable ignored) {
         }
     }
 

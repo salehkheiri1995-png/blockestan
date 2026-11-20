@@ -931,13 +931,19 @@ export function useGameController() {
         return;
       }
 
-      const rewardTimer = window.setTimeout(() => {
-        applyRewardedReward(purpose, requestId);
+      // Web / preview build: there is no real ad network here, so we never grant a reward.
+      // We show the brief overlay, then explain why nothing was added.
+      const webNoteTimer = window.setTimeout(() => {
+        snack(
+          purpose === RewardPurpose.COINS
+            ? 'در مرورگر تبلیغ واقعی نیست؛ برای دریافت سکه از نسخهٔ اندروید استفاده کن.'
+            : 'در مرورگر تبلیغ واقعی نیست؛ ادامهٔ بازی در نسخهٔ اندروید در دسترس است.'
+        );
       }, 1400);
 
       const closeTimer = window.setTimeout(closeAdOverlay, 1700);
 
-      adTimersRef.current.push(rewardTimer, closeTimer);
+      adTimersRef.current.push(webNoteTimer, closeTimer);
     },
     [applyRewardedReward, closeAdOverlay, snack]
   );
@@ -1057,7 +1063,7 @@ export function useGameController() {
         const parts: string[] = [];
         if (product.coins > 0) parts.push(`${faDigits(product.coins)} سکه`);
         if (product.gems > 0) parts.push(`${faDigits(product.gems)} الماس`);
-        snack(`خرید از کافه‌بازار انجام شد: ${parts.join(' و ')} به حساب اضافه شد.`);
+        snack(`پرداخت انجام شد ✓ ${parts.join(' و ')} خریداری و به حساب اضافه شد.`);
       } else {
         snack('ثبت بسته انجام نشد.');
       }

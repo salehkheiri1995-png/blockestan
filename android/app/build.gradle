@@ -61,6 +61,8 @@ dependencies {
     // Tapsell Mediation: standard banner + rewarded video.
     implementation "ir.tapsell:tapsell:1.4.0-alpha04"
     implementation "ir.tapsell.mediation.adapter:legacy:1.4.0-alpha04"
+    // Cafe Bazaar (Poolakey) in-app billing.
+    implementation "com.github.cafebazaar.Poolakey:poolakey:2.1.0"
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"

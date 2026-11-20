@@ -12,7 +12,6 @@ import { StoryModal } from './components/StoryModal';
 import { activeStoryChapter } from './data/story';
 import {
   hideBannerAd,
-  initializeAds,
   isNativeAdsAvailable,
   showBannerAd,
 } from './services/tapsellAds';
@@ -27,12 +26,9 @@ export function App() {
 
   const showNav = ui.screen !== Screen.GAME && ui.screen !== Screen.PRIVACY;
 
-  // Tapsell: warm the SDK up once, then keep the standard banner on menu screens only so the
-  // board stays unobstructed while playing.
-  useEffect(() => {
-    void initializeAds();
-  }, []);
-
+  // Tapsell: the SDK is initialized lazily (only when an ad is actually used), which keeps
+  // the app launch path free of any ad SDK work. The standard banner appears on menu screens
+  // only so the board stays unobstructed while playing.
   useEffect(() => {
     if (!isNativeAdsAvailable()) return;
     if (showNav) {

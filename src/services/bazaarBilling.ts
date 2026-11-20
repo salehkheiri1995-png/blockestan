@@ -1,13 +1,12 @@
+import { Capacitor, registerPlugin } from '@capacitor/core';
+
 /**
  * Cafe Bazaar In-App Billing (پرداخت درون‌برنامه‌ای کافه‌بازار) bridge.
  *
- * On Android (via WebView / Poolakey JS bridge):
- *   If `window.BazaarIAB` is injected by the Android host wrapper, purchases call
- *   the real Cafe Bazaar Poolakey SDK and resolve with a signed purchase token.
- *
- * On Web Preview / Browser:
- *   Falls back cleanly to the interactive Cafe Bazaar Sandbox Checkout Modal so
- *   players can test the full purchase & currency-grant flow safely.
+ * On Android the native Poolakey plugin (`BazaarIAB`) verifies every purchase signature against
+ * the developer RSA public key, so a `success: true` result always means a genuine, verified
+ * purchase. On Web / preview there is no native binding, so the interactive sandbox checkout modal
+ * is used for testing.
  */
 
 export interface NativeBazaarBridge {
@@ -21,6 +20,19 @@ export interface NativeBazaarBridge {
   }>;
 }
 
+interface BazaarIABPlugin {
+  isAvailable(): Promise<{ available: boolean }>;
+  launchPurchaseFlow(options: { sku: string; developerPayload: string }): Promise<{
+    success: boolean;
+    purchaseToken?: string;
+    orderId?: string;
+    cancelled?: boolean;
+    errorMessage?: string;
+  }>;
+}
+
+const nativePlugin = registerPlugin<BazaarIABPlugin>('BazaarIAB');
+
 declare global {
   interface Window {
     BazaarIAB?: NativeBazaarBridge;
@@ -28,6 +40,10 @@ declare global {
 }
 
 export function isNativeBazaarAvailable(): boolean {
+  // On the native app we use the Poolakey plugin; in the browser the fallback is the sandbox.
+  if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
+    return true;
+  }
   if (typeof window === 'undefined') return false;
   const bridge = window.BazaarIAB;
   if (!bridge || typeof bridge.launchPurchaseFlow !== 'function') return false;
@@ -44,8 +60,18 @@ export async function launchNativeBazaarPurchase(
   cancelled?: boolean;
   errorMessage?: string;
 }> {
-  if (!window.BazaarIAB) {
-    return { success: false, errorMessage: 'درگاه کافه‌بازار در محیط وب به‌صورت آزمایشی فعال است.' };
+  if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
+    try {
+      return await nativePlugin.launchPurchaseFlow({ sku, developerPayload });
+    } catch (error) {
+      return {
+        success: false,
+        errorMessage: error instanceof Error ? error.message : 'خطا در پرداخت کافه‌بازار',
+      };
+    }
   }
-  return window.BazaarIAB.launchPurchaseFlow(sku, developerPayload);
+  if (window.BazaarIAB) {
+    return window.BazaarIAB.launchPurchaseFlow(sku, developerPayload);
+  }
+  return { success: false, errorMessage: 'درگاه کافه‌بازار در محیط وب به‌صورت آزمایشی فعال است.' };
 }

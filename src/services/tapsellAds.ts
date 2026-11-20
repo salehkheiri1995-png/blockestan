@@ -32,17 +32,23 @@ function setBannerHeight(height: number): void {
   document.documentElement.style.setProperty('--ad-banner-h', `${Math.max(0, Math.round(height))}px`);
 }
 
-export async function initializeAds(): Promise<void> {
-  if (!isNativeAdsAvailable()) return;
-  try {
-    await bridge.initialize();
-  } catch {
-    // Ads are optional; never block the game on initialization.
+/**
+ * Lazily ensures the native Tapsell SDK is initialized once. Idempotent and guarded,
+ * so it never throws and never runs at app launch unless an ad is actually needed.
+ */
+let initPromise: Promise<void> | null = null;
+
+export function initializeAds(): Promise<void> {
+  if (!isNativeAdsAvailable()) return Promise.resolve();
+  if (!initPromise) {
+    initPromise = bridge.initialize().catch(() => undefined);
   }
+  return initPromise;
 }
 
 export async function showBannerAd(): Promise<void> {
   if (!isNativeAdsAvailable()) return;
+  await initializeAds();
   try {
     const result = await bridge.showBanner();
     setBannerHeight(result.visible ? result.height ?? 50 : 0);
@@ -63,6 +69,7 @@ export async function hideBannerAd(): Promise<void> {
 
 export async function showRewardedAd(): Promise<RewardedResult> {
   if (!isNativeAdsAvailable()) return { status: 'failed', message: 'native-unavailable' };
+  await initializeAds();
   try {
     return await bridge.showRewarded();
   } catch (error) {
